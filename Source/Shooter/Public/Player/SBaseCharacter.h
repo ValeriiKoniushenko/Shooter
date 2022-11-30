@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "SBaseCharacter.generated.h"
+
+class USpringArmComponent;
 
 UCLASS()
 class SHOOTER_API ASBaseCharacter : public ACharacter
@@ -13,6 +17,12 @@ class SHOOTER_API ASBaseCharacter : public ACharacter
 
 public:
 	ASBaseCharacter();
+
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	USpringArmComponent* SpringArmComponent;
+	
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	UCameraComponent* CameraComponent;
 
 	virtual void Tick(float DeltaTime) override;
 protected:

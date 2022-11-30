@@ -12,7 +12,15 @@ ASBaseCharacter::ASBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	check(SpringArmComponent);
+	SpringArmComponent->TargetArmLength = 500.f;
+	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->bUsePawnControlRotation = true;
 	
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	check(CameraComponent);
+	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
