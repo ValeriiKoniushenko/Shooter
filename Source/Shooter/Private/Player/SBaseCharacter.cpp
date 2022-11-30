@@ -15,7 +15,7 @@ ASBaseCharacter::ASBaseCharacter()
 	CameraPresets.Add({
 		"FPP",
 		0.f,
-		FVector(20.f, 0.f, 90.f),
+		FVector(0.f, 14.f, -26.f),
 		true,
 		false
 	});
@@ -28,8 +28,7 @@ ASBaseCharacter::ASBaseCharacter()
 	});
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-
+	SpringArmComponent->SetupAttachment(GetMesh(), "HeadSocket");
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
