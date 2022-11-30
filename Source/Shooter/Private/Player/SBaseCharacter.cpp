@@ -5,27 +5,44 @@
 
 #include "SBasePlayerController.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ASBaseCharacter::ASBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	CameraPresets.Add({
+		4.f,
+		FVector(0.f, 0.f, 90.f),
+		true
+	});
+	CameraPresets.Add({
+		500.f,
+		FVector(0.f, 0.f, 0.f),
+		true
+	});
+
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	check(SpringArmComponent);
-	SpringArmComponent->TargetArmLength = 500.f;
 	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->bUsePawnControlRotation = true;
-	
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	check(CameraComponent);
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ASBaseCharacter::SwitchCameraMode()
+{
+	CurrentActiveCameraPreset++;
+	if (CurrentActiveCameraPreset >= CameraPresets.Num())
+	{
+		CurrentActiveCameraPreset = 0;
+	}
+
+	SetCameraPreset(CurrentActiveCameraPreset);
 }
 
 void ASBaseCharacter::BeginPlay()
@@ -47,4 +64,13 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("MoveRight", CurrentController, &ASBasePlayerController::MoveRight);
 	PlayerInputComponent->BindAxis("MouseX", this, &ASBaseCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("MouseY", this, &ASBaseCharacter::AddControllerPitchInput);
+}
+
+void ASBaseCharacter::SetCameraPreset(uint32 Index)
+{
+	const FCameraPreset CameraPreset = CameraPresets[Index];
+
+	SpringArmComponent->TargetArmLength = CameraPreset.TargetArmLength;
+	SpringArmComponent->SetRelativeLocation(CameraPreset.RelativeLocation);
+	SpringArmComponent->bUsePawnControlRotation = CameraPreset.bUsePawnControlRotation;
 }

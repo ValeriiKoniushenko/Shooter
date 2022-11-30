@@ -19,7 +19,8 @@ void ASBasePlayerController::MoveRight(float Value)
 
 void ASBasePlayerController::ChangeCameraView()
 {
-	UE_LOG(LogTemp, Error, TEXT("Try to change camera view"));
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+	CurrentPlayer->SwitchCameraMode();
 }
 
 void ASBasePlayerController::WantToStartSprint()
