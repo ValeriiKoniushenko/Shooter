@@ -18,4 +18,7 @@ struct FCameraPreset
 
 	UPROPERTY(EditAnywhere)
 	bool bUsePawnControlRotation = true;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseControllerDesiredRotation = true;
 };

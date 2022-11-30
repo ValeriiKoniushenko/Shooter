@@ -5,6 +5,7 @@
 
 #include "SBasePlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ASBaseCharacter::ASBaseCharacter()
@@ -15,12 +16,14 @@ ASBaseCharacter::ASBaseCharacter()
 		"FPP",
 		0.f,
 		FVector(20.f, 0.f, 90.f),
-		true
+		true,
+		false
 	});
 	CameraPresets.Add({
 		"TPP",
 		500.f,
 		FVector(0.f, 0.f, 0.f),
+		true,
 		true
 	});
 
@@ -77,4 +80,5 @@ void ASBaseCharacter::SetCameraPreset(uint32 Index)
 	SpringArmComponent->TargetArmLength = CameraPreset.TargetArmLength;
 	SpringArmComponent->SetRelativeLocation(CameraPreset.RelativeLocation);
 	SpringArmComponent->bUsePawnControlRotation = CameraPreset.bUsePawnControlRotation;
+	GetCharacterMovement()->bUseControllerDesiredRotation = CameraPreset.bUseControllerDesiredRotation;
 }
