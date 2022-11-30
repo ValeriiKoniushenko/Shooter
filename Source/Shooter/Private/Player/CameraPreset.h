@@ -7,6 +7,9 @@ struct FCameraPreset
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleAnywhere)
+	FName Name;
+
 	UPROPERTY(EditAnywhere)
 	float TargetArmLength = 0;
 

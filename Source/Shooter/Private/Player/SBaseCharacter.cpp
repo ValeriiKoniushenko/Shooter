@@ -12,11 +12,13 @@ ASBaseCharacter::ASBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraPresets.Add({
-		4.f,
-		FVector(0.f, 0.f, 90.f),
+		"FPP",
+		0.f,
+		FVector(20.f, 0.f, 90.f),
 		true
 	});
 	CameraPresets.Add({
+		"TPP",
 		500.f,
 		FVector(0.f, 0.f, 0.f),
 		true
@@ -27,6 +29,8 @@ ASBaseCharacter::ASBaseCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	SetCameraPreset(0);
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
