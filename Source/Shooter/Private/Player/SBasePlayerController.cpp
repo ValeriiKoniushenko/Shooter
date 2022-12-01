@@ -7,8 +7,9 @@
 
 void ASBasePlayerController::MoveForward(float Value)
 {
-	ACharacter* CurrentPlayer = GetCharacter();
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
 	CurrentPlayer->AddMovementInput(CurrentPlayer->GetActorForwardVector(), Value);
+	CurrentPlayer->bIsRunForward = !FMath::IsNearlyZero(Value);
 }
 
 void ASBasePlayerController::MoveRight(float Value)
@@ -25,9 +26,14 @@ void ASBasePlayerController::ChangeCameraView()
 
 void ASBasePlayerController::WantToStartSprint()
 {
-	LastMaxWalkSpeed = GetCharacter()->GetCharacterMovement()->MaxWalkSpeed;
-	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = MaxSprintSpeed;
-	bIsSprinting = true;
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+
+	if (CurrentPlayer->bIsRunForward)
+	{
+		LastMaxWalkSpeed = CurrentPlayer->GetCharacterMovement()->MaxWalkSpeed;
+		CurrentPlayer->GetCharacterMovement()->MaxWalkSpeed = MaxSprintSpeed;
+		bIsSprinting = true;
+	}
 }
 
 void ASBasePlayerController::WantToStopSprint()
