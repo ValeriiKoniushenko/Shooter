@@ -78,6 +78,21 @@ const FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset() const
 	return CameraPresets[CurrentActiveCameraPreset];
 }
 
+void ASBaseCharacter::Jump()
+{
+	Super::Jump();
+
+	bIsWantToJump = true;
+	FTimerDelegate TimerCallback;
+	TimerCallback.BindLambda([this]
+	{
+		bIsWantToJump = false;
+	});
+
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, 0.1f, false);
+}
+
 void ASBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

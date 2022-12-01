@@ -46,6 +46,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsRunForward = false;
+
+	virtual void Jump() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bIsWantToJump = false;
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -53,5 +58,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Meta=(ClampMin=0, UIMin=0))
 	int32 CurrentActiveCameraPreset = 0;
-
 };
