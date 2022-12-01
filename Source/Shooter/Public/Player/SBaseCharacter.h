@@ -20,6 +20,12 @@ public:
 	ASBaseCharacter();
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	float MinCameraDistance = 100.f; // TODO: move to another class(new Camera class)
+
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	float MaxCameraDistance = 1500.f; // TODO: move to another class(new Camera class)
+
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
@@ -31,6 +37,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SwitchCameraMode();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsCanChangeSpringArmLength() const;
+
+	FCameraPreset& GetCurrentCameraPreset();
+	const FCameraPreset& GetCurrentCameraPreset() const;
 
 protected:
 	virtual void BeginPlay() override;

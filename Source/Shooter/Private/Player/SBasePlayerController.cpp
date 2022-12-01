@@ -35,3 +35,17 @@ void ASBasePlayerController::WantToStopSprint()
 	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = LastMaxWalkSpeed;
 	bIsSprinting = false;
 }
+
+void ASBasePlayerController::CameraDistance(float Value)
+{
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+
+	if (!FMath::IsNearlyZero(Value) && IsInputKeyDown(EKeys::LeftAlt) && CurrentPlayer->IsCanChangeSpringArmLength())
+	{
+		float& ArmLength = CurrentPlayer->SpringArmComponent->TargetArmLength;
+
+		CurrentPlayer->GetCurrentCameraPreset().TargetArmLength += Value;
+		ArmLength += Value;
+		ArmLength = FMath::Clamp(ArmLength, CurrentPlayer->MinCameraDistance, CurrentPlayer->MaxCameraDistance);
+	}
+}

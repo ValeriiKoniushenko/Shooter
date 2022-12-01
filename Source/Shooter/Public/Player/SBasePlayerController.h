@@ -22,6 +22,7 @@ public:
 	virtual void ChangeCameraView();
 	virtual void WantToStartSprint();
 	virtual void WantToStopSprint();
+	virtual void CameraDistance(float Value);
 private:
 	float LastMaxWalkSpeed = 0;
 	bool bIsSprinting = false;

@@ -21,9 +21,16 @@ ASBaseCharacter::ASBaseCharacter()
 	});
 	CameraPresets.Add({
 		"TPP",
-		500.f,
+		200.f,
 		FVector(0.f, 0.f, 0.f),
 		true,
+		true,
+		{
+			true,
+			true,
+			15.f,
+			15.f,
+		},
 		true
 	});
 
@@ -33,6 +40,11 @@ ASBaseCharacter::ASBaseCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
 	SetCameraPreset(0);
+
+	GetCharacterMovement()->MaxAcceleration = 1000.f;
+	GetCharacterMovement()->BrakingFrictionFactor = 0.4f;
+
+	CameraComponent->FieldOfView = 120.f;
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
@@ -49,6 +61,21 @@ void ASBaseCharacter::SwitchCameraMode()
 	}
 
 	SetCameraPreset(CurrentActiveCameraPreset);
+}
+
+bool ASBaseCharacter::IsCanChangeSpringArmLength() const
+{
+	return GetCurrentCameraPreset().bIsCanChangeArmLength;
+}
+
+FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset()
+{
+	return CameraPresets[CurrentActiveCameraPreset];
+}
+
+const FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset() const
+{
+	return CameraPresets[CurrentActiveCameraPreset];
 }
 
 void ASBaseCharacter::BeginPlay()
@@ -70,6 +97,7 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("MoveRight", CurrentController, &ASBasePlayerController::MoveRight);
 	PlayerInputComponent->BindAxis("MouseX", this, &ASBaseCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("MouseY", this, &ASBaseCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("CameraDistance", CurrentController, &ASBasePlayerController::CameraDistance);
 }
 
 void ASBaseCharacter::SetCameraPreset(uint32 Index)
@@ -80,4 +108,15 @@ void ASBaseCharacter::SetCameraPreset(uint32 Index)
 	SpringArmComponent->SetRelativeLocation(CameraPreset.RelativeLocation);
 	SpringArmComponent->bUsePawnControlRotation = CameraPreset.bUsePawnControlRotation;
 	GetCharacterMovement()->bUseControllerDesiredRotation = CameraPreset.bUseControllerDesiredRotation;
+	if (CameraPreset.Lag.bIsEnabled)
+	{
+		SpringArmComponent->bEnableCameraLag = true;
+		SpringArmComponent->CameraLagSpeed = CameraPreset.Lag.Speed;
+		SpringArmComponent->bEnableCameraRotationLag = CameraPreset.Lag.bIsRotation;
+		SpringArmComponent->CameraRotationLagSpeed = CameraPreset.Lag.RotationSpeed;
+	}
+	else
+	{
+		SpringArmComponent->bEnableCameraLag = false;
+	}
 }
