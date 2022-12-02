@@ -33,6 +33,9 @@ struct FCameraPreset
 	float TargetArmLength = 0;
 
 	UPROPERTY(EditAnywhere)
+	float ArmOffset = 0;
+
+	UPROPERTY(EditAnywhere)
 	FVector RelativeLocation;
 
 	UPROPERTY(EditAnywhere)

@@ -15,13 +15,15 @@ ASBaseCharacter::ASBaseCharacter()
 	CameraPresets.Add({
 		"FPP",
 		0.f,
-		FVector(0.f, 14.f, -26.f),
+		0.f,
+		FVector(0.f, -1.f, -21.f),
 		true,
 		false
 	});
 	CameraPresets.Add({
 		"TPP",
 		200.f,
+		150.f,
 		FVector(0.f, 0.f, 0.f),
 		true,
 		true,
@@ -120,6 +122,7 @@ void ASBaseCharacter::SetCameraPreset(uint32 Index)
 	const FCameraPreset CameraPreset = CameraPresets[Index];
 
 	SpringArmComponent->TargetArmLength = CameraPreset.TargetArmLength;
+	SpringArmComponent->SocketOffset = FVector(0.f, CameraPreset.ArmOffset, 0.f);
 	SpringArmComponent->SetRelativeLocation(CameraPreset.RelativeLocation);
 	SpringArmComponent->bUsePawnControlRotation = CameraPreset.bUsePawnControlRotation;
 	GetCharacterMovement()->bUseControllerDesiredRotation = CameraPreset.bUseControllerDesiredRotation;
