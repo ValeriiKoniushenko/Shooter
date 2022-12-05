@@ -12,6 +12,12 @@ ASBaseCharacter::ASBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	SpringArmComponent->SetupAttachment(GetMesh(), "HeadSocket");
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(SpringArmComponent);
+	CameraComponent->FieldOfView = 120.f;
+
 	CameraPresets.Add({
 		"FPP",
 		0.f,
@@ -35,18 +41,10 @@ ASBaseCharacter::ASBaseCharacter()
 		},
 		true
 	});
-
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(GetMesh(), "HeadSocket");
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
-
 	SetCameraPreset(0);
 
 	GetCharacterMovement()->MaxAcceleration = 1000.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.4f;
-
-	CameraComponent->FieldOfView = 120.f;
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
@@ -95,9 +93,26 @@ void ASBaseCharacter::Jump()
 	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, 0.1f, false);
 }
 
+void ASBaseCharacter::SpawnWeapon()
+{
+	if (!GetWorld())
+	{
+		return;
+	}
+
+	WeaponBase = GetWorld()->SpawnActor<ASWeaponBase>(WeaponClass);
+	if (WeaponBase)
+	{
+		WeaponBase->SetOwner(this);
+		WeaponBase->AttachToComponent(GetMesh(), {EAttachmentRule::SnapToTarget, false}, "WeaponSocket");
+	}
+}
+
 void ASBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ASBaseCharacter::SpawnWeapon();
 }
 
 void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -113,6 +128,8 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	                                 &ASBasePlayerController::WantToStartSprint);
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Pressed, CurrentController,
 	                                 &ASBasePlayerController::StartStopCameraControl);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, CurrentController,
+	                                 &ASBasePlayerController::Fire);
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Released, CurrentController,
 	                                 &ASBasePlayerController::EndStopCameraControl);
 

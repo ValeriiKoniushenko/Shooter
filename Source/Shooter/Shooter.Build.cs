@@ -14,7 +14,8 @@ public class Shooter : ModuleRules
 		PublicIncludePaths.AddRange(new[]
 		{
 			"Shooter/Public/Player",
-			"Shooter/Public/UI"
+			"Shooter/Public/UI",
+			"Shooter/Public/Weapon"
 		});
 	}
 }

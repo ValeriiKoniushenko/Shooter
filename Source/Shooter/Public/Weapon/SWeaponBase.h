@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "SWeaponBase.generated.h"
 
-class UStaticMeshComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
 class SHOOTER_API ASWeaponBase : public AActor
@@ -16,11 +16,17 @@ class SHOOTER_API ASWeaponBase : public AActor
 public:
 	ASWeaponBase();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* StaticMeshComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=General)
+	USkeletalMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=General)
+	FName BulletOutSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=10, ClampMin=10))
+	float FireDistance;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void MakeShot();
 protected:
 	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 };

@@ -83,7 +83,16 @@ void ASBasePlayerController::MouseX(float Value)
 		FVector& SocketOffset = CurrentPlayer->SpringArmComponent->SocketOffset;
 
 		CurrentPlayer->GetCurrentCameraPreset().ArmOffset += Value;
-		SocketOffset.Y += Value;
+		SocketOffset.Y += Value * 2.f;
 		SocketOffset.Y = FMath::Clamp(SocketOffset.Y, CurrentPlayer->MinArmOffset, CurrentPlayer->MaxArmOffset);
+	}
+}
+
+void ASBasePlayerController::Fire()
+{
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+	if (CurrentPlayer->WeaponBase)
+	{
+		CurrentPlayer->WeaponBase->MakeShot();
 	}
 }

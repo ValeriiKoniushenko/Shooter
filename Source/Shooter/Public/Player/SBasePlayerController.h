@@ -26,6 +26,7 @@ public:
 	virtual void WantToStopSprint();
 	virtual void CameraDistance(float Value);
 	virtual void MouseX(float Value);
+	virtual void Fire();
 private:
 	float LastMaxWalkSpeed = 0;
 	bool bIsSprinting = false;

@@ -7,8 +7,10 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/CameraPreset.h"
+#include "Weapon/SWeaponBase.h"
 #include "SBaseCharacter.generated.h"
 
+class SWeaponBase;
 class USpringArmComponent;
 
 UCLASS()
@@ -18,12 +20,18 @@ class SHOOTER_API ASBaseCharacter : public ACharacter
 
 public:
 	ASBaseCharacter();
+	UPROPERTY(Category=Weapon, EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ASWeaponBase> WeaponClass;
+
+	UPROPERTY()
+	ASWeaponBase* WeaponBase = nullptr;
+
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	float MinArmOffset = -200.f; // TODO: move to another class(new Camera class)
-	
+
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	float MaxArmOffset = 200.f; // TODO: move to another class(new Camera class)
-	
+
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	float MinCameraDistance = 100.f; // TODO: move to another class(new Camera class)
 
@@ -60,10 +68,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsWantToJump = false;
 protected:
+	virtual void SpawnWeapon();
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void SetCameraPreset(uint32 Index);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Meta=(ClampMin=0, UIMin=0))
 	int32 CurrentActiveCameraPreset = 0;
+private:
 };
