@@ -18,7 +18,12 @@ class SHOOTER_API ASBaseCharacter : public ACharacter
 
 public:
 	ASBaseCharacter();
-
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	float MinArmOffset = -200.f; // TODO: move to another class(new Camera class)
+	
+	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
+	float MaxArmOffset = 200.f; // TODO: move to another class(new Camera class)
+	
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	float MinCameraDistance = 100.f; // TODO: move to another class(new Camera class)
 
@@ -34,12 +39,15 @@ public:
 	UPROPERTY(Category=Camera, EditAnywhere)
 	TArray<FCameraPreset> CameraPresets;
 
+	UPROPERTY(Category=Camera, VisibleAnywhere, BlueprintReadWrite)
+	bool bIsCanYaw = true;
+
 	virtual void Tick(float DeltaTime) override;
 
 	void SwitchCameraMode();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsCanChangeSpringArmLength() const;
+	bool IsCanChangeSpringArmStats() const;
 
 	FCameraPreset& GetCurrentCameraPreset();
 	const FCameraPreset& GetCurrentCameraPreset() const;

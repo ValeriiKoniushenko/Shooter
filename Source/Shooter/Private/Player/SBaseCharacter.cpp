@@ -65,7 +65,7 @@ void ASBaseCharacter::SwitchCameraMode()
 	SetCameraPreset(CurrentActiveCameraPreset);
 }
 
-bool ASBaseCharacter::IsCanChangeSpringArmLength() const
+bool ASBaseCharacter::IsCanChangeSpringArmStats() const
 {
 	return GetCurrentCameraPreset().bIsCanChangeArmLength;
 }
@@ -107,12 +107,20 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	ASBasePlayerController* CurrentController = Cast<ASBasePlayerController>(GetController());
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASBaseCharacter::Jump);
-	PlayerInputComponent->BindAction("ChangeCameraView", IE_Pressed, CurrentController, &ASBasePlayerController::ChangeCameraView);
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, CurrentController, &ASBasePlayerController::WantToStartSprint);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, CurrentController, &ASBasePlayerController::WantToStopSprint);
+	PlayerInputComponent->BindAction("ChangeCameraView", IE_Pressed, CurrentController,
+	                                 &ASBasePlayerController::ChangeCameraView);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, CurrentController,
+	                                 &ASBasePlayerController::WantToStartSprint);
+	PlayerInputComponent->BindAction("StopCameraControl", IE_Pressed, CurrentController,
+	                                 &ASBasePlayerController::StartStopCameraControl);
+	PlayerInputComponent->BindAction("StopCameraControl", IE_Released, CurrentController,
+	                                 &ASBasePlayerController::EndStopCameraControl);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Released, CurrentController,
+	                                 &ASBasePlayerController::WantToStopSprint);
 	PlayerInputComponent->BindAxis("MoveForward", CurrentController, &ASBasePlayerController::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", CurrentController, &ASBasePlayerController::MoveRight);
-	PlayerInputComponent->BindAxis("MouseX", this, &ASBaseCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("MouseX", CurrentController, &ASBasePlayerController::MouseX);
 	PlayerInputComponent->BindAxis("MouseY", this, &ASBaseCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("CameraDistance", CurrentController, &ASBasePlayerController::CameraDistance);
 }

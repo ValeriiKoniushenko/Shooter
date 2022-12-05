@@ -19,10 +19,13 @@ public:
 
 	virtual void MoveForward(float Value);
 	virtual void MoveRight(float Value);
+	virtual void StartStopCameraControl();
+	virtual void EndStopCameraControl();
 	virtual void ChangeCameraView();
 	virtual void WantToStartSprint();
 	virtual void WantToStopSprint();
 	virtual void CameraDistance(float Value);
+	virtual void MouseX(float Value);
 private:
 	float LastMaxWalkSpeed = 0;
 	bool bIsSprinting = false;
