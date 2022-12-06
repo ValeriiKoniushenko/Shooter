@@ -29,4 +29,6 @@ public:
 	virtual void MakeShot();
 protected:
 	virtual void BeginPlay() override;
+	AController* GetController();
+	FVector GetCameraHitLocation();
 };
