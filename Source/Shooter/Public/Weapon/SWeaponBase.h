@@ -23,12 +23,24 @@ public:
 	FName BulletOutSocketName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=10, ClampMin=10))
-	float FireDistance;
+	float FireDistance= 5000.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
+	float RateOfFire = 0.07f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
+	bool bIsAutomaticWeapon = true;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void MakeShot();
+	virtual void StartFire();
+	virtual void StopFire();
+
 protected:
+	virtual void Fire();
 	virtual void BeginPlay() override;
 	AController* GetController();
 	FVector GetCameraHitLocation();
+
+protected:
+	FTimerHandle TimerHandler;
 };

@@ -129,7 +129,9 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Pressed, CurrentController,
 	                                 &ASBasePlayerController::StartStopCameraControl);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, CurrentController,
-	                                 &ASBasePlayerController::Fire);
+	                                 &ASBasePlayerController::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, CurrentController,
+	                                 &ASBasePlayerController::StopFire);
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Released, CurrentController,
 	                                 &ASBasePlayerController::EndStopCameraControl);
 

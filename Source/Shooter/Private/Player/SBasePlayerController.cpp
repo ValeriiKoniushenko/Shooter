@@ -88,11 +88,20 @@ void ASBasePlayerController::MouseX(float Value)
 	}
 }
 
-void ASBasePlayerController::Fire()
+void ASBasePlayerController::StartFire()
 {
 	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
 	if (CurrentPlayer->WeaponBase)
 	{
-		CurrentPlayer->WeaponBase->MakeShot();
+		CurrentPlayer->WeaponBase->StartFire();
+	}
+}
+
+void ASBasePlayerController::StopFire()
+{
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+	if (CurrentPlayer->WeaponBase)
+	{
+		CurrentPlayer->WeaponBase->StopFire();
 	}
 }

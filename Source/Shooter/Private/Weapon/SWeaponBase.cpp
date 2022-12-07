@@ -15,7 +15,17 @@ ASWeaponBase::ASWeaponBase()
 	check(StaticMeshComponent);
 }
 
-void ASWeaponBase::MakeShot()
+void ASWeaponBase::StartFire()
+{
+	GetWorldTimerManager().SetTimer(TimerHandler, this, &ASWeaponBase::Fire, RateOfFire, bIsAutomaticWeapon);
+}
+
+void ASWeaponBase::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandler);
+}
+
+void ASWeaponBase::Fire()
 {
 	const FTransform SocketTransform = StaticMeshComponent->GetSocketTransform(BulletOutSocketName);
 	const FVector TraceStart = SocketTransform.GetLocation();
@@ -25,11 +35,7 @@ void ASWeaponBase::MakeShot()
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility);
 	if (HitResult.bBlockingHit)
 	{
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3.f, 3, 5.f);
-	}
-	else
-	{
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 3.f, 3, 5.f);
+		DrawDebugSphere(GetWorld(), HitResult.Location, 10.f, 8, FColor::Red, false, 1.f, 3, 1.f);
 	}
 }
 
