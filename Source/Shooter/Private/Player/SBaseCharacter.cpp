@@ -134,9 +134,11 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	                                 &ASBasePlayerController::StopFire);
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Released, CurrentController,
 	                                 &ASBasePlayerController::EndStopCameraControl);
-
+	PlayerInputComponent->BindAction("ReloadWeapon", IE_Pressed, CurrentController,
+	                                 &ASBasePlayerController::ReloadWeapon);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, CurrentController,
 	                                 &ASBasePlayerController::WantToStopSprint);
+
 	PlayerInputComponent->BindAxis("MoveForward", CurrentController, &ASBasePlayerController::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", CurrentController, &ASBasePlayerController::MoveRight);
 	PlayerInputComponent->BindAxis("MouseX", CurrentController, &ASBasePlayerController::MouseX);

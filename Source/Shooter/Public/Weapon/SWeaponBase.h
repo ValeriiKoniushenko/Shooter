@@ -8,6 +8,7 @@
 
 class USkeletalMeshComponent;
 class UMaterialInterface;
+class USoundCue;
 
 UCLASS()
 class SHOOTER_API ASWeaponBase : public AActor
@@ -27,13 +28,22 @@ public:
 	float FireDistance = 5000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
-	float RateOfFire = 0.07f;
+	float RateOfFire = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
-	float Spread = 10.f;
+	float Spread = 2.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
 	bool bIsAutomaticWeapon = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
+	int32 BulletsPerMagazine = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
+	int32 BulletsPerMagazineNow = BulletsPerMagazine;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
+	int32 TotalCountOfBullets = 300;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Decals)
 	UMaterialInterface* BulletHoleDecal;
@@ -44,15 +54,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Decals)
 	FVector DecalSize = FVector(8.0f, 8.0f, 8.0f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Sounds)
+	USoundCue* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Sounds)
+	USoundCue* ReloadSound;
+
 	UFUNCTION(BlueprintCallable)
 	virtual void StartFire();
 	virtual void StopFire();
+	virtual void Reload();
 
 protected:
 	virtual void Fire();
 	virtual void BeginPlay() override;
 	AController* GetController();
-	FVector GetCameraHitLocation();
 
 protected:
 	FTimerHandle TimerHandler;

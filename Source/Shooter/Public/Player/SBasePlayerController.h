@@ -28,6 +28,7 @@ public:
 	virtual void MouseX(float Value);
 	virtual void StartFire();
 	virtual void StopFire();
+	virtual void ReloadWeapon();
 private:
 	float LastMaxWalkSpeed = 0;
 	bool bIsSprinting = false;

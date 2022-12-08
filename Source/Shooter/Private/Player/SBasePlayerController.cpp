@@ -105,3 +105,12 @@ void ASBasePlayerController::StopFire()
 		CurrentPlayer->WeaponBase->StopFire();
 	}
 }
+
+void ASBasePlayerController::ReloadWeapon()
+{
+	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
+	if (CurrentPlayer->WeaponBase)
+	{
+		CurrentPlayer->WeaponBase->Reload();
+	}
+}

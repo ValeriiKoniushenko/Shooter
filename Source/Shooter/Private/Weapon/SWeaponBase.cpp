@@ -6,6 +6,7 @@
 #include "SBaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInterface.h"
+#include "Sound/SoundCue.h"
 
 ASWeaponBase::ASWeaponBase()
 {
@@ -25,8 +26,27 @@ void ASWeaponBase::StopFire()
 	GetWorldTimerManager().ClearTimer(TimerHandler);
 }
 
+void ASWeaponBase::Reload()
+{
+	if (TotalCountOfBullets <= 0)
+	{
+		return;
+	}
+
+	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+	const int32 GotFromMagazine = FMath::Clamp(TotalCountOfBullets, 0, BulletsPerMagazine - BulletsPerMagazineNow);
+	BulletsPerMagazineNow += GotFromMagazine;
+	TotalCountOfBullets -= GotFromMagazine;
+	UE_LOG(LogTemp, Warning, TEXT("%d %d"), BulletsPerMagazineNow, TotalCountOfBullets);
+}
+
 void ASWeaponBase::Fire()
 {
+	if (BulletsPerMagazineNow <= 0)
+	{
+		return;
+	}
+
 	const AController* Controller = GetController();
 
 	FVector ViewLocation;
@@ -35,7 +55,7 @@ void ASWeaponBase::Fire()
 
 	FVector Direction = ViewRotation.Vector();
 	Direction = FMath::VRandCone(Direction, FMath::DegreesToRadians(Spread), FMath::DegreesToRadians(Spread));
-	
+
 	const FVector TraceStart = ViewLocation;
 	const FVector TraceEnd = TraceStart + Direction * FireDistance;
 
@@ -53,6 +73,10 @@ void ASWeaponBase::Fire()
 		                                     EAttachLocation::KeepRelativeOffset,
 		                                     DecalLifeSpan);
 	}
+
+	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
+
+	--BulletsPerMagazineNow;
 }
 
 void ASWeaponBase::BeginPlay()
@@ -75,25 +99,4 @@ AController* ASWeaponBase::GetController()
 	}
 
 	return CurrentPlayer->GetController();
-}
-
-FVector ASWeaponBase::GetCameraHitLocation()
-{
-	AController* Controller = GetController();
-
-	FVector ViewLocation;
-	FRotator ViewRotation;
-	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
-
-	const FVector TraceStart = ViewLocation;
-	const FVector TraceEnd = TraceStart + ViewRotation.Vector() * 10000.f;
-
-	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility);
-
-	if (HitResult.bBlockingHit)
-	{
-		return HitResult.Location;
-	}
-	return TraceEnd;
 }
