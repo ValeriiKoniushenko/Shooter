@@ -27,12 +27,18 @@ void ASWeaponBase::StopFire()
 
 void ASWeaponBase::Fire()
 {
-	const FTransform SocketTransform = StaticMeshComponent->GetSocketTransform(BulletOutSocketName);
-	const FVector TraceStart = SocketTransform.GetLocation();
-	const FVector TraceEnd = TraceStart + (GetCameraHitLocation() - TraceStart).GetSafeNormal() * FireDistance;
+	const AController* Controller = GetController();
+
+	FVector ViewLocation;
+	FRotator ViewRotation;
+	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+
+	const FVector TraceStart = ViewLocation;
+	const FVector TraceEnd = TraceStart + ViewRotation.Vector() * FireDistance;
 
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility);
+	
 	if (HitResult.bBlockingHit)
 	{
 		DrawDebugSphere(GetWorld(), HitResult.Location, 10.f, 8, FColor::Red, false, 1.f, 3, 1.f);
