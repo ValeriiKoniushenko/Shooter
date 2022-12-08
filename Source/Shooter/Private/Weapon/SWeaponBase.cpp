@@ -8,6 +8,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Sound/SoundCue.h"
 #include "Animation/AnimMontage.h"
+#include "Components/DecalComponent.h"
 
 ASWeaponBase::ASWeaponBase()
 {
@@ -27,27 +28,38 @@ void ASWeaponBase::StopFire()
 	GetWorldTimerManager().ClearTimer(TimerHandler);
 }
 
-void ASWeaponBase::Reload()
+bool ASWeaponBase::Reload()
 {
 	if (TotalCountOfBullets <= 0 || BulletsPerMagazine == BulletsPerMagazineNow)
 	{
-		return;
+		return false;
 	}
 
-	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+	// UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound); // TODO: return this line and fix a double-sound
 	const int32 GotFromMagazine = FMath::Clamp(TotalCountOfBullets, 0, BulletsPerMagazine - BulletsPerMagazineNow);
 	BulletsPerMagazineNow += GotFromMagazine;
 	TotalCountOfBullets -= GotFromMagazine;
 	Cast<ACharacter>(GetOwner())->PlayAnimMontage(ReloadAnimation);
 
+	bIsCanShoot = false;
+
 	UE_LOG(LogTemp, Warning, TEXT("%d %d"), BulletsPerMagazineNow, TotalCountOfBullets);
+	return true;
 }
 
 void ASWeaponBase::Fire()
 {
-	if (BulletsPerMagazineNow <= 0)
+	if (!bIsCanShoot)
 	{
 		return;
+	}
+
+	if (BulletsPerMagazineNow <= 0)
+	{
+		if (!Reload())
+		{
+			return;
+		}
 	}
 
 	const AController* Controller = GetController();
@@ -70,11 +82,13 @@ void ASWeaponBase::Fire()
 
 	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
 	{
-		UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize, HitResult.GetComponent(),
-		                                     NAME_None,
-		                                     HitResult.Location, HitResult.Normal.Rotation(),
-		                                     EAttachLocation::KeepRelativeOffset,
-		                                     DecalLifeSpan);
+		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize,
+		                                                              HitResult.GetComponent(),
+		                                                              NAME_None,
+		                                                              HitResult.Location, HitResult.Normal.Rotation(),
+		                                                              EAttachLocation::KeepRelativeOffset,
+		                                                              DecalLifeSpan);
+		Decal->SetFadeScreenSize(0);
 	}
 
 	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);

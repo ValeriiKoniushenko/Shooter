@@ -66,7 +66,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void StartFire();
 	virtual void StopFire();
-	virtual void Reload();
+	virtual bool Reload();
+
+	UPROPERTY()
+	bool bIsCanShoot = true;
 
 protected:
 	virtual void Fire();
