@@ -60,6 +60,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Sounds)
 	USoundCue* ReloadSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
+	UAnimMontage* ReloadAnimation;
+
 	UFUNCTION(BlueprintCallable)
 	virtual void StartFire();
 	virtual void StopFire();

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInterface.h"
 #include "Sound/SoundCue.h"
+#include "Animation/AnimMontage.h"
 
 ASWeaponBase::ASWeaponBase()
 {
@@ -28,7 +29,7 @@ void ASWeaponBase::StopFire()
 
 void ASWeaponBase::Reload()
 {
-	if (TotalCountOfBullets <= 0)
+	if (TotalCountOfBullets <= 0 || BulletsPerMagazine == BulletsPerMagazineNow)
 	{
 		return;
 	}
@@ -37,6 +38,8 @@ void ASWeaponBase::Reload()
 	const int32 GotFromMagazine = FMath::Clamp(TotalCountOfBullets, 0, BulletsPerMagazine - BulletsPerMagazineNow);
 	BulletsPerMagazineNow += GotFromMagazine;
 	TotalCountOfBullets -= GotFromMagazine;
+	Cast<ACharacter>(GetOwner())->PlayAnimMontage(ReloadAnimation);
+
 	UE_LOG(LogTemp, Warning, TEXT("%d %d"), BulletsPerMagazineNow, TotalCountOfBullets);
 }
 
