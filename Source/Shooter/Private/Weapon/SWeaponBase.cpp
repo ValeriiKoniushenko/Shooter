@@ -4,8 +4,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SBaseCharacter.h"
-#include "Kismet/KismetSystemLibrary.h"
-
+#include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInterface.h"
 
 ASWeaponBase::ASWeaponBase()
 {
@@ -33,15 +33,25 @@ void ASWeaponBase::Fire()
 	FRotator ViewRotation;
 	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
 
+	FVector Direction = ViewRotation.Vector();
+	Direction = FMath::VRandCone(Direction, FMath::DegreesToRadians(Spread), FMath::DegreesToRadians(Spread));
+	
 	const FVector TraceStart = ViewLocation;
-	const FVector TraceEnd = TraceStart + ViewRotation.Vector() * FireDistance;
+	const FVector TraceEnd = TraceStart + Direction * FireDistance;
+
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(GetOwner());
 
 	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility);
-	
-	if (HitResult.bBlockingHit)
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
+
+	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
 	{
-		DrawDebugSphere(GetWorld(), HitResult.Location, 10.f, 8, FColor::Red, false, 1.f, 3, 1.f);
+		UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize, HitResult.GetComponent(),
+		                                     NAME_None,
+		                                     HitResult.Location, HitResult.Normal.Rotation(),
+		                                     EAttachLocation::KeepRelativeOffset,
+		                                     DecalLifeSpan);
 	}
 }
 

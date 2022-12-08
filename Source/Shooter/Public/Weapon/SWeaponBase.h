@@ -7,6 +7,7 @@
 #include "SWeaponBase.generated.h"
 
 class USkeletalMeshComponent;
+class UMaterialInterface;
 
 UCLASS()
 class SHOOTER_API ASWeaponBase : public AActor
@@ -23,13 +24,25 @@ public:
 	FName BulletOutSocketName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=10, ClampMin=10))
-	float FireDistance= 5000.f;
-	
+	float FireDistance = 5000.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
 	float RateOfFire = 0.07f;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
+	float Spread = 10.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
 	bool bIsAutomaticWeapon = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Decals)
+	UMaterialInterface* BulletHoleDecal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Decals)
+	float DecalLifeSpan = 60.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Decals)
+	FVector DecalSize = FVector(8.0f, 8.0f, 8.0f);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void StartFire();
