@@ -18,13 +18,39 @@ ASWeaponBase::ASWeaponBase()
 	check(StaticMeshComponent);
 }
 
+float ASWeaponBase::GetBulletSpread()
+{
+	AController* Controller = GetController();
+	if (!Controller)
+	{
+		return 0.f;
+	}
+
+	ASBaseCharacter* Player = Cast<ASBaseCharacter>(Controller->GetCharacter());
+	if (!Player)
+	{
+		return 0.f;
+	}
+
+	if (Player->bIsRunForward)
+	{
+		return FMath::DegreesToRadians(Spread * 5.f);
+	}
+
+	return FMath::DegreesToRadians(Spread);
+}
+
 void ASWeaponBase::StartFire()
 {
-	GetWorldTimerManager().SetTimer(TimerHandler, this, &ASWeaponBase::Fire, RateOfFire, bIsAutomaticWeapon);
+	Fire();
+	bIsWantToFire = true;
+	GetWorldTimerManager().SetTimer(TimerHandler, this, &ASWeaponBase::Fire, RateOfFire, bIsAutomaticWeapon,
+	                                RateOfFire);
 }
 
 void ASWeaponBase::StopFire()
 {
+	bIsWantToFire = false;
 	GetWorldTimerManager().ClearTimer(TimerHandler);
 }
 
@@ -49,7 +75,7 @@ bool ASWeaponBase::Reload()
 
 void ASWeaponBase::Fire()
 {
-	if (!bIsCanShoot)
+	if (!bIsCanShoot || !bIsWantToFire)
 	{
 		return;
 	}
@@ -69,7 +95,7 @@ void ASWeaponBase::Fire()
 	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
 
 	FVector Direction = ViewRotation.Vector();
-	Direction = FMath::VRandCone(Direction, FMath::DegreesToRadians(Spread), FMath::DegreesToRadians(Spread));
+	Direction = FMath::VRandCone(Direction, GetBulletSpread(), GetBulletSpread());
 
 	const FVector TraceStart = ViewLocation;
 	const FVector TraceEnd = TraceStart + Direction * FireDistance;

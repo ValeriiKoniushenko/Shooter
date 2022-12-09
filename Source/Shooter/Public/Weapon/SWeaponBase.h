@@ -18,6 +18,9 @@ class SHOOTER_API ASWeaponBase : public AActor
 public:
 	ASWeaponBase();
 
+	UFUNCTION(BlueprintCallable)
+	float GetBulletSpread();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=General)
 	USkeletalMeshComponent* StaticMeshComponent;
 
@@ -31,7 +34,7 @@ public:
 	float RateOfFire = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting, meta=(UIMin=0, ClampMin=0))
-	float Spread = 2.f;
+	float Spread = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Shooting)
 	bool bIsAutomaticWeapon = true;
@@ -78,4 +81,7 @@ protected:
 
 protected:
 	FTimerHandle TimerHandler;
+
+private:
+	bool bIsWantToFire = true;
 };
