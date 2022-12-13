@@ -3,53 +3,39 @@
 
 #include "Player/SBaseCharacter.h"
 
-#include "SBasePlayerController.h"
+#include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "SBasePlayerController.h"
 
 ASBaseCharacter::ASBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	check(AbilitySystemComponent);
+
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	check(SpringArmComponent);
 	SpringArmComponent->SetupAttachment(GetMesh(), "HeadSocket");
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	check(CameraComponent);
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->FieldOfView = 120.f;
 
-	CameraPresets.Add({
-		"FPP",
-		0.f,
-		0.f,
-		FVector(0.f, -1.f, -21.f),
-		true,
-		false
-	});
-	CameraPresets.Add({
-		"TPP",
-		200.f,
-		150.f,
-		FVector(0.f, 0.f, 0.f),
-		true,
-		true,
-		{
-			true,
-			true,
-			15.f,
-			15.f,
-		},
-		true
-	});
+	InitCameraPresets();
 	SetCameraPreset(0);
 
-	GetCharacterMovement()->MaxAcceleration = 1000.f;
+	GetCharacterMovement()->MaxAcceleration = 1400.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.4f;
 }
 
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("Speed: %d"), bIsRunForward);
 }
 
 void ASBaseCharacter::SwitchCameraMode()
@@ -93,6 +79,11 @@ void ASBaseCharacter::Jump()
 	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, 0.1f, false);
 }
 
+UAbilitySystemComponent* ASBaseCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void ASBaseCharacter::SpawnWeapon()
 {
 	if (!GetWorld())
@@ -126,6 +117,8 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	                                 &ASBasePlayerController::ChangeCameraView);
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, CurrentController,
 	                                 &ASBasePlayerController::WantToStartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, CurrentController,
+	                                 &ASBasePlayerController::WantToStopSprint);
 	PlayerInputComponent->BindAction("StopCameraControl", IE_Pressed, CurrentController,
 	                                 &ASBasePlayerController::StartStopCameraControl);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, CurrentController,
@@ -136,8 +129,6 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	                                 &ASBasePlayerController::EndStopCameraControl);
 	PlayerInputComponent->BindAction("ReloadWeapon", IE_Pressed, CurrentController,
 	                                 &ASBasePlayerController::ReloadWeapon);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, CurrentController,
-	                                 &ASBasePlayerController::WantToStopSprint);
 
 	PlayerInputComponent->BindAxis("MoveForward", CurrentController, &ASBasePlayerController::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", CurrentController, &ASBasePlayerController::MoveRight);
@@ -166,4 +157,31 @@ void ASBaseCharacter::SetCameraPreset(uint32 Index)
 	{
 		SpringArmComponent->bEnableCameraLag = false;
 	}
+}
+
+void ASBaseCharacter::InitCameraPresets()
+{
+	CameraPresets.Add({
+		"FPP",
+		0.f,
+		0.f,
+		FVector(0.f, -1.f, -21.f),
+		true,
+		false
+	});
+	CameraPresets.Add({
+		"TPP",
+		200.f,
+		150.f,
+		FVector(0.f, 0.f, 0.f),
+		true,
+		true,
+		{
+			true,
+			true,
+			15.f,
+			15.f,
+		},
+		true
+	});
 }

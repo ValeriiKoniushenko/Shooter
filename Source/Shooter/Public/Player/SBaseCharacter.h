@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "Camera/CameraComponent.h"
+#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/CameraPreset.h"
@@ -11,15 +12,17 @@
 #include "SBaseCharacter.generated.h"
 
 class SWeaponBase;
+class UAbilitySystemComponent;
 class USpringArmComponent;
 
 UCLASS()
-class SHOOTER_API ASBaseCharacter : public ACharacter
+class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	ASBaseCharacter();
+	
 	UPROPERTY(Category=Weapon, EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ASWeaponBase> WeaponClass;
 
@@ -50,30 +53,45 @@ public:
 	UPROPERTY(Category=Camera, VisibleAnywhere, BlueprintReadWrite)
 	bool bIsCanYaw = true;
 
-	virtual void Tick(float DeltaTime) override;
-
-	void SwitchCameraMode();
-
-	UFUNCTION(BlueprintCallable)
-	bool IsCanChangeSpringArmStats() const;
-
-	FCameraPreset& GetCurrentCameraPreset();
-	const FCameraPreset& GetCurrentCameraPreset() const;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsRunForward = false;
 
-	virtual void Jump() override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsWantToJump = false;
-protected:
-	virtual void SpawnWeapon();
-	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void SetCameraPreset(uint32 Index);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	bool IsCanChangeSpringArmStats() const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void Jump() override;
+	
+	void SwitchCameraMode();
+
+	FCameraPreset& GetCurrentCameraPreset();
+	
+	const FCameraPreset& GetCurrentCameraPreset() const;
+	
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Meta=(ClampMin=0, UIMin=0))
 	int32 CurrentActiveCameraPreset = 0;
+	
+protected:
+	virtual void SpawnWeapon();
+
+	virtual void BeginPlay() override;
+	
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	void SetCameraPreset(uint32 Index);
+	
 private:
+	void InitCameraPresets();
 };

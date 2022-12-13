@@ -10,6 +10,7 @@ void ASBasePlayerController::MoveForward(float Value)
 	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
 	CurrentPlayer->AddMovementInput(CurrentPlayer->GetActorForwardVector(), Value, true);
 	CurrentPlayer->bIsRunForward = Value > 0.f;
+	// UE_LOG(LogTemp, Warning, TEXT("Speed: %f %d"), Value, CurrentPlayer->bIsRunForward);
 }
 
 void ASBasePlayerController::MoveRight(float Value)
