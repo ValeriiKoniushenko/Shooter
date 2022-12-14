@@ -85,6 +85,7 @@ protected:
 private:
 	void GetTraceStartAndEnd(FVector& TraceStart, FVector TraceEnd);
 	FHitResult MakeHit();
+	void SpawnDecal(const FHitResult& HitResult);
 	
 private:
 	bool bIsWantToFire = true;

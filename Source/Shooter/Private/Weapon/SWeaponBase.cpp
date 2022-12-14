@@ -91,16 +91,7 @@ void ASWeaponBase::Fire()
 
 	FHitResult HitResult = MakeHit();
 
-	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
-	{
-		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize,
-		                                                              HitResult.GetComponent(),
-		                                                              NAME_None,
-		                                                              HitResult.Location, HitResult.Normal.Rotation(),
-		                                                              EAttachLocation::KeepRelativeOffset,
-		                                                              DecalLifeSpan);
-		Decal->SetFadeScreenSize(0);
-	}
+	SpawnDecal(HitResult);
 
 	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 
@@ -150,5 +141,19 @@ FHitResult ASWeaponBase::MakeHit()
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
 
 	return HitResult;
+}
+
+void ASWeaponBase::SpawnDecal(const FHitResult& HitResult)
+{
+	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
+	{
+		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize,
+																	  HitResult.GetComponent(),
+																	  NAME_None,
+																	  HitResult.Location, HitResult.Normal.Rotation(),
+																	  EAttachLocation::KeepRelativeOffset,
+																	  DecalLifeSpan);
+		Decal->SetFadeScreenSize(0);
+	}
 }
 
