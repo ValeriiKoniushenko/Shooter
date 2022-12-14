@@ -83,5 +83,9 @@ protected:
 	FTimerHandle TimerHandler;
 
 private:
+	void GetTraceStartAndEnd(FVector& TraceStart, FVector TraceEnd);
+	FHitResult MakeHit();
+	
+private:
 	bool bIsWantToFire = true;
 };

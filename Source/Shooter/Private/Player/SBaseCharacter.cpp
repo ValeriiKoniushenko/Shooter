@@ -8,10 +8,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SBasePlayerController.h"
+#include "GAS/SMainCharacterAttributeSet.h"
 
 ASBaseCharacter::ASBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	AttributeSet = CreateDefaultSubobject<USMainCharacterAttributeSet>(TEXT("AttributeSet"));
+	check(AttributeSet);
 
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	check(AbilitySystemComponent);
@@ -35,7 +39,6 @@ ASBaseCharacter::ASBaseCharacter()
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("Speed: %d"), bIsRunForward);
 }
 
 void ASBaseCharacter::SwitchCameraMode()
@@ -47,6 +50,24 @@ void ASBaseCharacter::SwitchCameraMode()
 	}
 
 	SetCameraPreset(CurrentActiveCameraPreset);
+}
+
+void ASBaseCharacter::GiveAbilities()
+{
+	AquireAbility(ReloadAbility);
+}
+
+void ASBaseCharacter::AquireAbility(TSubclassOf<UGameplayAbility> Ability)
+{
+	if (AbilitySystemComponent)
+	{
+		if (HasAuthority() && Ability)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, 0));
+		}
+
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
 }
 
 bool ASBaseCharacter::IsCanChangeSpringArmStats() const
@@ -104,6 +125,8 @@ void ASBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ASBaseCharacter::SpawnWeapon();
+
+	GiveAbilities();
 }
 
 void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)

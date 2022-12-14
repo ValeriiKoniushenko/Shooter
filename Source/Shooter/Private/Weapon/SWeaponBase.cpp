@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Weapon/SWeaponBase.h"
+
+#include "AbilitySystemComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SBaseCharacter.h"
@@ -69,7 +71,6 @@ bool ASWeaponBase::Reload()
 
 	bIsCanShoot = false;
 
-	UE_LOG(LogTemp, Warning, TEXT("%d %d"), BulletsPerMagazineNow, TotalCountOfBullets);
 	return true;
 }
 
@@ -88,23 +89,7 @@ void ASWeaponBase::Fire()
 		}
 	}
 
-	const AController* Controller = GetController();
-
-	FVector ViewLocation;
-	FRotator ViewRotation;
-	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
-
-	FVector Direction = ViewRotation.Vector();
-	Direction = FMath::VRandCone(Direction, GetBulletSpread(), GetBulletSpread());
-
-	const FVector TraceStart = ViewLocation;
-	const FVector TraceEnd = TraceStart + Direction * FireDistance;
-
-	FCollisionQueryParams CollisionQueryParams;
-	CollisionQueryParams.AddIgnoredActor(GetOwner());
-
-	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
+	FHitResult HitResult = MakeHit();
 
 	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
 	{
@@ -143,3 +128,27 @@ AController* ASWeaponBase::GetController()
 
 	return CurrentPlayer->GetController();
 }
+
+FHitResult ASWeaponBase::MakeHit()
+{
+	const AController* Controller = GetController();
+
+	FVector ViewLocation;
+	FRotator ViewRotation;
+	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+
+	FVector Direction = ViewRotation.Vector();
+	Direction = FMath::VRandCone(Direction, GetBulletSpread(), GetBulletSpread());
+
+	const FVector TraceStart = ViewLocation;
+	const FVector TraceEnd = TraceStart + Direction * FireDistance;
+
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(GetOwner());
+
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
+
+	return HitResult;
+}
+

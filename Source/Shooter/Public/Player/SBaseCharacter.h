@@ -5,6 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "Camera/CameraComponent.h"
 #include "CoreMinimal.h"
+#include "Abilities/GameplayAbility.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/CameraPreset.h"
@@ -13,6 +14,7 @@
 
 class SWeaponBase;
 class UAbilitySystemComponent;
+class USMainCharacterAttributeSet;
 class USpringArmComponent;
 
 UCLASS()
@@ -22,7 +24,7 @@ class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInte
 
 public:
 	ASBaseCharacter();
-	
+
 	UPROPERTY(Category=Weapon, EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ASWeaponBase> WeaponClass;
 
@@ -62,7 +64,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UAbilitySystemComponent* AbilitySystemComponent;
 
+	UPROPERTY(Category=GAS, EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UGameplayAbility> ReloadAbility;
+
+	UPROPERTY(Category=GAS, EditAnywhere, BlueprintReadWrite)
+	USMainCharacterAttributeSet* AttributeSet;
+
 public:
+	UFUNCTION(BlueprintCallable)
+	void AquireAbility(TSubclassOf<UGameplayAbility> Ability);
+
 	UFUNCTION(BlueprintCallable)
 	bool IsCanChangeSpringArmStats() const;
 
@@ -72,26 +83,28 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Jump() override;
-	
+
 	void SwitchCameraMode();
 
+	void GiveAbilities();
+
 	FCameraPreset& GetCurrentCameraPreset();
-	
+
 	const FCameraPreset& GetCurrentCameraPreset() const;
-	
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Meta=(ClampMin=0, UIMin=0))
 	int32 CurrentActiveCameraPreset = 0;
-	
+
 protected:
 	virtual void SpawnWeapon();
 
 	virtual void BeginPlay() override;
-	
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	void SetCameraPreset(uint32 Index);
-	
+
 private:
 	void InitCameraPresets();
 };
