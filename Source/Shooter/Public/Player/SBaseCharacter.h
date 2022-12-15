@@ -97,6 +97,10 @@ protected:
 	int32 CurrentActiveCameraPreset = 0;
 
 protected:
+	UFUNCTION()
+	void OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+	                            class AController* InstigatedBy, AActor* DamageCauser);
+
 	virtual void SpawnWeapon();
 
 	virtual void BeginPlay() override;

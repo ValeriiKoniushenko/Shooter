@@ -93,6 +93,12 @@ void ASWeaponBase::Fire()
 
 	SpawnDecal(HitResult);
 
+	if (HitResult.Actor.Get())
+	{
+		HitResult.Actor->TakeDamage(10.f, FDamageEvent{}, GetController(), GetController()->GetCharacter());
+		UE_LOG(LogTemp, Warning, TEXT("Hit in the actor!"));
+	}
+
 	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 
 	--BulletsPerMagazineNow;
@@ -148,12 +154,11 @@ void ASWeaponBase::SpawnDecal(const FHitResult& HitResult)
 	if (HitResult.bBlockingHit && !HitResult.Actor.Get())
 	{
 		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAttached(BulletHoleDecal, DecalSize,
-																	  HitResult.GetComponent(),
-																	  NAME_None,
-																	  HitResult.Location, HitResult.Normal.Rotation(),
-																	  EAttachLocation::KeepRelativeOffset,
-																	  DecalLifeSpan);
+		                                                              HitResult.GetComponent(),
+		                                                              NAME_None,
+		                                                              HitResult.Location, HitResult.Normal.Rotation(),
+		                                                              EAttachLocation::KeepRelativeOffset,
+		                                                              DecalLifeSpan);
 		Decal->SetFadeScreenSize(0);
 	}
 }
-

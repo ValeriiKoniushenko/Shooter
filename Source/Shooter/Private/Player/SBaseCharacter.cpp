@@ -39,6 +39,8 @@ ASBaseCharacter::ASBaseCharacter()
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	TakeDamage(0.1f, FDamageEvent{}, Controller, this);
 }
 
 void ASBaseCharacter::SwitchCameraMode()
@@ -127,6 +129,8 @@ void ASBaseCharacter::BeginPlay()
 	ASBaseCharacter::SpawnWeapon();
 
 	GiveAbilities();
+
+	OnTakeAnyDamage.AddDynamic(this, &ASBaseCharacter::OnTakeAnyDamageHandler);
 }
 
 void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -207,4 +211,12 @@ void ASBaseCharacter::InitCameraPresets()
 		},
 		true
 	});
+}
+
+void ASBaseCharacter::OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+                                             AController* InstigatedBy, AActor* DamageCauser)
+{
+	AttributeSet->Health.SetCurrentValue(AttributeSet->Health.GetCurrentValue() - Damage);
+	const float Health = FMath::Clamp(AttributeSet->Health.GetCurrentValue(), 0.f, AttributeSet->Health.GetBaseValue());
+	AttributeSet->Health.SetCurrentValue(Health);
 }
