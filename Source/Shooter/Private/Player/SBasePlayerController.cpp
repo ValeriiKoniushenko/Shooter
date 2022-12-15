@@ -4,6 +4,7 @@
 #include "Player/SBasePlayerController.h"
 #include "SBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/SMainCameraComponent.h"
 
 void ASBasePlayerController::MoveForward(float Value)
 {
@@ -35,7 +36,7 @@ void ASBasePlayerController::EndStopCameraControl()
 void ASBasePlayerController::ChangeCameraView()
 {
 	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
-	CurrentPlayer->SwitchCameraMode();
+	CurrentPlayer->CameraComponent->SwitchCameraMode();
 }
 
 void ASBasePlayerController::WantToStartSprint()
@@ -60,13 +61,15 @@ void ASBasePlayerController::CameraDistance(float Value)
 {
 	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
 
-	if (!FMath::IsNearlyZero(Value) && IsInputKeyDown(EKeys::LeftAlt) && CurrentPlayer->IsCanChangeSpringArmStats())
+	if (!FMath::IsNearlyZero(Value) && IsInputKeyDown(EKeys::LeftAlt) && CurrentPlayer->CameraComponent->
+		IsCanChangeSpringArmStats())
 	{
 		float& ArmLength = CurrentPlayer->SpringArmComponent->TargetArmLength;
 
-		CurrentPlayer->GetCurrentCameraPreset().TargetArmLength += Value;
+		CurrentPlayer->CameraComponent->GetCurrentCameraPreset().TargetArmLength += Value;
 		ArmLength += Value;
-		ArmLength = FMath::Clamp(ArmLength, CurrentPlayer->MinCameraDistance, CurrentPlayer->MaxCameraDistance);
+		ArmLength = FMath::Clamp(ArmLength, CurrentPlayer->CameraComponent->MinCameraDistance,
+		                         CurrentPlayer->CameraComponent->MaxCameraDistance);
 	}
 }
 
@@ -79,13 +82,15 @@ void ASBasePlayerController::MouseX(float Value)
 		CurrentPlayer->AddControllerYawInput(Value);
 	}
 
-	if (!FMath::IsNearlyZero(Value) && IsInputKeyDown(EKeys::LeftAlt) && CurrentPlayer->IsCanChangeSpringArmStats())
+	if (!FMath::IsNearlyZero(Value) && IsInputKeyDown(EKeys::LeftAlt) && CurrentPlayer->CameraComponent->
+		IsCanChangeSpringArmStats())
 	{
 		FVector& SocketOffset = CurrentPlayer->SpringArmComponent->SocketOffset;
 
-		CurrentPlayer->GetCurrentCameraPreset().ArmOffset += Value;
+		CurrentPlayer->CameraComponent->GetCurrentCameraPreset().ArmOffset += Value;
 		SocketOffset.Y += Value * 2.f;
-		SocketOffset.Y = FMath::Clamp(SocketOffset.Y, CurrentPlayer->MinArmOffset, CurrentPlayer->MaxArmOffset);
+		SocketOffset.Y = FMath::Clamp(SocketOffset.Y, CurrentPlayer->CameraComponent->MinArmOffset,
+		                              CurrentPlayer->CameraComponent->MaxArmOffset);
 	}
 }
 

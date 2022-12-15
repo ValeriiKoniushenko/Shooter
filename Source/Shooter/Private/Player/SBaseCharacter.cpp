@@ -10,7 +10,6 @@
 #include "SBasePlayerController.h"
 #include "GAS/SMainCharacterAttributeSet.h"
 #include "Animation/AnimMontage.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "Camera/SMainCameraComponent.h"
 
 ASBaseCharacter::ASBaseCharacter()
@@ -31,9 +30,10 @@ ASBaseCharacter::ASBaseCharacter()
 	check(CameraComponent);
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->FieldOfView = 120.f;
-
+	CameraComponent->SpringArmComponent = SpringArmComponent;
+	
 	InitCameraPresets();
-	SetCameraPreset(0);
+	CameraComponent->SetCameraPreset(0);
 
 	GetCharacterMovement()->MaxAcceleration = 1400.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.4f;
@@ -42,17 +42,6 @@ ASBaseCharacter::ASBaseCharacter()
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void ASBaseCharacter::SwitchCameraMode()
-{
-	CurrentActiveCameraPreset++;
-	if (CurrentActiveCameraPreset >= CameraPresets.Num())
-	{
-		CurrentActiveCameraPreset = 0;
-	}
-
-	SetCameraPreset(CurrentActiveCameraPreset);
 }
 
 void ASBaseCharacter::GiveAbilities()
@@ -73,24 +62,9 @@ void ASBaseCharacter::AquireAbility(TSubclassOf<UGameplayAbility> Ability)
 	}
 }
 
-bool ASBaseCharacter::IsCanChangeSpringArmStats() const
-{
-	return GetCurrentCameraPreset().bIsCanChangeArmLength;
-}
-
 bool ASBaseCharacter::IsDead() const
 {
 	return FMath::IsNearlyZero(AttributeSet->Health.GetCurrentValue());
-}
-
-FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset()
-{
-	return CameraPresets[CurrentActiveCameraPreset];
-}
-
-const FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset() const
-{
-	return CameraPresets[CurrentActiveCameraPreset];
 }
 
 void ASBaseCharacter::Jump()
@@ -170,31 +144,9 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("CameraDistance", CurrentController, &ASBasePlayerController::CameraDistance);
 }
 
-void ASBaseCharacter::SetCameraPreset(uint32 Index)
-{
-	const FCameraPreset CameraPreset = CameraPresets[Index];
-
-	SpringArmComponent->TargetArmLength = CameraPreset.TargetArmLength;
-	SpringArmComponent->SocketOffset = FVector(0.f, CameraPreset.ArmOffset, 0.f);
-	SpringArmComponent->SetRelativeLocation(CameraPreset.RelativeLocation);
-	SpringArmComponent->bUsePawnControlRotation = CameraPreset.bUsePawnControlRotation;
-	GetCharacterMovement()->bUseControllerDesiredRotation = CameraPreset.bUseControllerDesiredRotation;
-	if (CameraPreset.Lag.bIsEnabled)
-	{
-		SpringArmComponent->bEnableCameraLag = true;
-		SpringArmComponent->CameraLagSpeed = CameraPreset.Lag.Speed;
-		SpringArmComponent->bEnableCameraRotationLag = CameraPreset.Lag.bIsRotation;
-		SpringArmComponent->CameraRotationLagSpeed = CameraPreset.Lag.RotationSpeed;
-	}
-	else
-	{
-		SpringArmComponent->bEnableCameraLag = false;
-	}
-}
-
 void ASBaseCharacter::InitCameraPresets()
 {
-	CameraPresets.Add({
+	CameraComponent->CameraPresets.Add({
 		"FPP",
 		0.f,
 		0.f,
@@ -202,7 +154,7 @@ void ASBaseCharacter::InitCameraPresets()
 		true,
 		false
 	});
-	CameraPresets.Add({
+	CameraComponent->CameraPresets.Add({
 		"TPP",
 		200.f,
 		150.f,
