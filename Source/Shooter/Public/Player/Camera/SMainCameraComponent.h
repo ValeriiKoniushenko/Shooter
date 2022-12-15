@@ -15,23 +15,23 @@ class SHOOTER_API USMainCameraComponent : public UCameraComponent
 	GENERATED_BODY()
 public:
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
-	float MinArmOffset = -200.f; // TODO: move to another class(new Camera class)
+	float MinArmOffset = -200.f;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
-	float MaxArmOffset = 200.f; // TODO: move to another class(new Camera class)
+	float MaxArmOffset = 200.f;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
-	float MinCameraDistance = 100.f; // TODO: move to another class(new Camera class)
+	float MinCameraDistance = 100.f;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
-	float MaxCameraDistance = 1500.f; // TODO: move to another class(new Camera class)
+	float MaxCameraDistance = 1500.f;
 
 	UPROPERTY(Category=Camera, EditAnywhere)
 	TArray<FCameraPreset> CameraPresets;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USpringArmComponent* SpringArmComponent;
-	
+
 public:
 	UFUNCTION(BlueprintCallable)
 	bool IsCanChangeSpringArmStats() const;

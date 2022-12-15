@@ -11,8 +11,13 @@
 #include "GAS/SMainCharacterAttributeSet.h"
 #include "Animation/AnimMontage.h"
 #include "Camera/SMainCameraComponent.h"
+#include "MovementComponent/MainCharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
-ASBaseCharacter::ASBaseCharacter()
+ASBaseCharacter::ASBaseCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UMainCharacterMovementComponent>(
+		CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -31,7 +36,7 @@ ASBaseCharacter::ASBaseCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->FieldOfView = 120.f;
 	CameraComponent->SpringArmComponent = SpringArmComponent;
-	
+
 	InitCameraPresets();
 	CameraComponent->SetCameraPreset(0);
 
@@ -199,16 +204,21 @@ void ASBaseCharacter::OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage,
 
 void ASBaseCharacter::Landed(const FHitResult& Hit)
 {
-	const UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	const UMainCharacterMovementComponent* MovementComponent = Cast<UMainCharacterMovementComponent>(
+		GetCharacterMovement());
 
-	const float Gravity = FMath::Abs(MovementComponent->GetGravityZ() / 100.f);
-	const float Height = FMath::Abs((MovementComponent->Velocity.Z / 100.f)); // 1m = 100cm
-	const float Speed = FMath::Sqrt(Gravity * 2.f * Height);
-	const float Momentum = Speed * MovementComponent->Mass;
-	float Damage = Momentum / FallDamageDevider - FallDamageAbsorption;
-	Damage = FMath::Clamp(Damage, 0.f, 10000000.f);
+	if (!MovementComponent)
+	{
+		return;
+	}
+
+	const float Damage = MovementComponent->GetCountOfFallDamage();
 	TakeDamage(Damage, FDamageEvent{}, Controller, this);
-	UE_LOG(LogTemp, Warning, TEXT("Fallen from: %f ; Damage: %f"), MovementComponent->Velocity.Z, Damage);
+
+	if (Damage > 0.f)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), FallDamageSound);
+	}
 
 	Super::Landed(Hit);
 }

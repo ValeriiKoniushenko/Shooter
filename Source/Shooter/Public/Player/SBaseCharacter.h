@@ -15,6 +15,7 @@ class UAbilitySystemComponent;
 class USMainCharacterAttributeSet;
 class USpringArmComponent;
 class USMainCameraComponent;
+class USoundCue;
 
 UCLASS()
 class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -22,22 +23,19 @@ class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInte
 	GENERATED_BODY()
 
 public:
-	ASBaseCharacter();
+	ASBaseCharacter(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
-	float FallDamageAbsorption = 10.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
-	float FallDamageDevider = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
+	UPROPERTY(Category=Animations, EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* DeathAnimation;
 
 	UPROPERTY(Category=Weapon, EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ASWeaponBase> WeaponClass;
 
+	UPROPERTY(Category=Sounds, EditAnywhere, BlueprintReadWrite)
+	USoundCue* FallDamageSound;
+
 	UPROPERTY()
-	ASWeaponBase* WeaponBase = nullptr;
+	ASWeaponBase* WeaponBase;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
 	USpringArmComponent* SpringArmComponent;
