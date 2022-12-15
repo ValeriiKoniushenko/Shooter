@@ -10,6 +10,8 @@
 #include "SBasePlayerController.h"
 #include "GAS/SMainCharacterAttributeSet.h"
 #include "Animation/AnimMontage.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Camera/SMainCameraComponent.h"
 
 ASBaseCharacter::ASBaseCharacter()
 {
@@ -25,7 +27,7 @@ ASBaseCharacter::ASBaseCharacter()
 	check(SpringArmComponent);
 	SpringArmComponent->SetupAttachment(GetMesh(), "HeadSocket");
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent = CreateDefaultSubobject<USMainCameraComponent>(TEXT("Camera"));
 	check(CameraComponent);
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->FieldOfView = 120.f;
@@ -241,4 +243,20 @@ void ASBaseCharacter::OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage,
 	{
 		Dead();
 	}
+}
+
+void ASBaseCharacter::Landed(const FHitResult& Hit)
+{
+	const UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+
+	const float Gravity = FMath::Abs(MovementComponent->GetGravityZ() / 100.f);
+	const float Height = FMath::Abs((MovementComponent->Velocity.Z / 100.f)); // 1m = 100cm
+	const float Speed = FMath::Sqrt(Gravity * 2.f * Height);
+	const float Momentum = Speed * MovementComponent->Mass;
+	float Damage = Momentum / FallDamageDevider - FallDamageAbsorption;
+	Damage = FMath::Clamp(Damage, 0.f, 10000000.f);
+	TakeDamage(Damage, FDamageEvent{}, Controller, this);
+	UE_LOG(LogTemp, Warning, TEXT("Fallen from: %f ; Damage: %f"), MovementComponent->Velocity.Z, Damage);
+
+	Super::Landed(Hit);
 }

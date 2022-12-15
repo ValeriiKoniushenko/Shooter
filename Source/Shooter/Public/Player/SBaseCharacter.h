@@ -16,6 +16,7 @@ class SWeaponBase;
 class UAbilitySystemComponent;
 class USMainCharacterAttributeSet;
 class USpringArmComponent;
+class USMainCameraComponent;
 
 UCLASS()
 class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -24,6 +25,12 @@ class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInte
 
 public:
 	ASBaseCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
+	float FallDamageAbsorption = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
+	float FallDamageDevider = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
 	UAnimMontage* DeathAnimation;
@@ -50,7 +57,7 @@ public:
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(Category=Camera, EditAnywhere, BlueprintReadWrite)
-	UCameraComponent* CameraComponent;
+	USMainCameraComponent* CameraComponent;
 
 	UPROPERTY(Category=Camera, EditAnywhere)
 	TArray<FCameraPreset> CameraPresets;
@@ -106,6 +113,8 @@ protected:
 	UFUNCTION()
 	void OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 	                            class AController* InstigatedBy, AActor* DamageCauser);
+
+	virtual void Landed(const FHitResult& Hit) override;
 
 	virtual void SpawnWeapon();
 

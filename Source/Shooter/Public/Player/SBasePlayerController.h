@@ -6,9 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "SBasePlayerController.generated.h"
 
-/**
- * 
- */
+#pragma warning(push)
+#pragma warning(disable: 4263)
+#pragma warning(disable: 4264)
+
 UCLASS()
 class SHOOTER_API ASBasePlayerController : public APlayerController
 {
@@ -33,3 +34,5 @@ private:
 	float LastMaxWalkSpeed = 0;
 	bool bIsSprinting = false;
 };
+
+#pragma warning(pop)
