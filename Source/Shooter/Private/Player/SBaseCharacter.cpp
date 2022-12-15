@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "SBasePlayerController.h"
 #include "GAS/SMainCharacterAttributeSet.h"
+#include "Animation/AnimMontage.h"
 
 ASBaseCharacter::ASBaseCharacter()
 {
@@ -39,8 +40,6 @@ ASBaseCharacter::ASBaseCharacter()
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	TakeDamage(0.1f, FDamageEvent{}, Controller, this);
 }
 
 void ASBaseCharacter::SwitchCameraMode()
@@ -75,6 +74,11 @@ void ASBaseCharacter::AquireAbility(TSubclassOf<UGameplayAbility> Ability)
 bool ASBaseCharacter::IsCanChangeSpringArmStats() const
 {
 	return GetCurrentCameraPreset().bIsCanChangeArmLength;
+}
+
+bool ASBaseCharacter::IsDead() const
+{
+	return FMath::IsNearlyZero(AttributeSet->Health.GetCurrentValue());
 }
 
 FCameraPreset& ASBaseCharacter::GetCurrentCameraPreset()
@@ -213,10 +217,28 @@ void ASBaseCharacter::InitCameraPresets()
 	});
 }
 
+void ASBaseCharacter::Dead()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+
+	PlayAnimMontage(DeathAnimation);
+	bIsDead = true;
+
+	UnPossessed();
+}
+
 void ASBaseCharacter::OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                              AController* InstigatedBy, AActor* DamageCauser)
 {
 	AttributeSet->Health.SetCurrentValue(AttributeSet->Health.GetCurrentValue() - Damage);
 	const float Health = FMath::Clamp(AttributeSet->Health.GetCurrentValue(), 0.f, AttributeSet->Health.GetBaseValue());
 	AttributeSet->Health.SetCurrentValue(Health);
+
+	if (IsDead())
+	{
+		Dead();
+	}
 }

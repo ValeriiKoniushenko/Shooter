@@ -25,6 +25,9 @@ class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInte
 public:
 	ASBaseCharacter();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
+	UAnimMontage* DeathAnimation;
+
 	UPROPERTY(Category=Weapon, EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ASWeaponBase> WeaponClass;
 
@@ -78,6 +81,9 @@ public:
 	bool IsCanChangeSpringArmStats() const;
 
 	UFUNCTION(BlueprintCallable)
+	bool IsDead() const;
+
+	UFUNCTION(BlueprintCallable)
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual void Tick(float DeltaTime) override;
@@ -111,4 +117,7 @@ protected:
 
 private:
 	void InitCameraPresets();
+
+	void Dead();
+	bool bIsDead = false;
 };
