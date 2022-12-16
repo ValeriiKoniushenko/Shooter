@@ -17,6 +17,16 @@ class USpringArmComponent;
 class USMainCameraComponent;
 class USoundCue;
 
+USTRUCT()
+struct FStaminaCost
+{
+	GENERATED_BODY()
+	
+	float Run = .1f;
+	float Sprint = .2f;
+	float Jump = 10.f;
+};
+
 UCLASS()
 class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -24,7 +34,14 @@ class SHOOTER_API ASBaseCharacter : public ACharacter, public IAbilitySystemInte
 
 public:
 	ASBaseCharacter(const FObjectInitializer& ObjectInitializer);
-
+	virtual ~ASBaseCharacter() override;
+	
+	UPROPERTY(Category=Stamina, EditAnywhere, BlueprintReadWrite)
+	float StaminaRegenFactor = 5.f;
+	
+	UPROPERTY(Category=Stamina, EditAnywhere, BlueprintReadWrite)
+	float StaminaUpdateRate = 1.f;
+	
 	UPROPERTY(Category=Animations, EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* DeathAnimation;
 
@@ -61,6 +78,7 @@ public:
 	UPROPERTY(Category=GAS, EditAnywhere, BlueprintReadWrite)
 	USMainCharacterAttributeSet* AttributeSet;
 
+	FStaminaCost StaminaStats;
 public:
 	UFUNCTION(BlueprintCallable)
 	void AquireAbility(TSubclassOf<UGameplayAbility> Ability);
@@ -77,6 +95,7 @@ public:
 
 	void GiveAbilities();
 
+	void ReduceStamina(float Value);
 protected:
 	UFUNCTION()
 	void OnTakeAnyDamageHandler(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
@@ -90,9 +109,12 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void RegenStamina();
+	
 private:
 	void InitCameraPresets();
 
 	void Dead();
 	bool bIsDead = false;
+	FTimerHandle StaminaTimer;
 };

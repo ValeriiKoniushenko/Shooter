@@ -44,6 +44,14 @@ ASBaseCharacter::ASBaseCharacter(const FObjectInitializer& ObjectInitializer) :
 	GetCharacterMovement()->BrakingFrictionFactor = 0.4f;
 }
 
+ASBaseCharacter::~ASBaseCharacter()
+{
+	// if (GetWorld())
+	// {
+	// 	GetWorld()->GetTimerManager().ClearTimer(StaminaTimer);
+	// }
+}
+
 void ASBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -52,6 +60,13 @@ void ASBaseCharacter::Tick(float DeltaTime)
 void ASBaseCharacter::GiveAbilities()
 {
 	AquireAbility(ReloadAbility);
+}
+
+void ASBaseCharacter::ReduceStamina(float Value)
+{
+	AttributeSet->Stamina.SetCurrentValue(AttributeSet->Stamina.GetCurrentValue() - Value);
+	if (AttributeSet->Stamina.GetCurrentValue() < 0.f)
+		AttributeSet->Stamina.SetCurrentValue(0.f);
 }
 
 void ASBaseCharacter::AquireAbility(TSubclassOf<UGameplayAbility> Ability)
@@ -74,8 +89,12 @@ bool ASBaseCharacter::IsDead() const
 
 void ASBaseCharacter::Jump()
 {
-	Super::Jump();
-
+	if (AttributeSet->Stamina.GetCurrentValue() < StaminaStats.Jump)
+	{
+		return;
+	}
+	ReduceStamina(StaminaStats.Jump);
+	
 	bIsWantToJump = true;
 	FTimerDelegate TimerCallback;
 	TimerCallback.BindLambda([this]
@@ -85,6 +104,8 @@ void ASBaseCharacter::Jump()
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, 0.1f, false);
+
+	Super::Jump();
 }
 
 UAbilitySystemComponent* ASBaseCharacter::GetAbilitySystemComponent() const
@@ -116,6 +137,11 @@ void ASBaseCharacter::BeginPlay()
 	GiveAbilities();
 
 	OnTakeAnyDamage.AddDynamic(this, &ASBaseCharacter::OnTakeAnyDamageHandler);
+
+	if (GetWorld())
+	{
+		GetWorldTimerManager().SetTimer(StaminaTimer, this, &ASBaseCharacter::RegenStamina, StaminaUpdateRate, true);
+	}
 }
 
 void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -147,6 +173,13 @@ void ASBaseCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("MouseX", CurrentController, &ASBasePlayerController::MouseX);
 	PlayerInputComponent->BindAxis("MouseY", this, &ASBaseCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("CameraDistance", CurrentController, &ASBasePlayerController::CameraDistance);
+}
+
+void ASBaseCharacter::RegenStamina()
+{
+	AttributeSet->Stamina.SetCurrentValue(AttributeSet->Stamina.GetCurrentValue() + StaminaRegenFactor);
+	if (AttributeSet->Stamina.GetCurrentValue() > AttributeSet->Stamina.GetBaseValue())
+		AttributeSet->Stamina.SetCurrentValue(AttributeSet->Stamina.GetBaseValue());
 }
 
 void ASBaseCharacter::InitCameraPresets()

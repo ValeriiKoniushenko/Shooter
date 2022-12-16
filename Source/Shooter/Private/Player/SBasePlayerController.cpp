@@ -5,13 +5,30 @@
 #include "SBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/SMainCameraComponent.h"
+#include "GAS/SMainCharacterAttributeSet.h"
 
 void ASBasePlayerController::MoveForward(float Value)
 {
 	ASBaseCharacter* CurrentPlayer = Cast<ASBaseCharacter>(GetCharacter());
 	CurrentPlayer->AddMovementInput(CurrentPlayer->GetActorForwardVector(), Value, true);
 	CurrentPlayer->bIsRunForward = Value > 0.f;
-	// UE_LOG(LogTemp, Warning, TEXT("Speed: %f %d"), Value, CurrentPlayer->bIsRunForward);
+
+	if (!FMath::IsNearlyZero(Value))
+	{
+		if (bIsSprinting)
+		{
+			CurrentPlayer->ReduceStamina(CurrentPlayer->StaminaStats.Sprint);
+		}
+		else
+		{
+			CurrentPlayer->ReduceStamina(CurrentPlayer->StaminaStats.Run);
+		}
+	}
+
+	if (CurrentPlayer->AttributeSet->Stamina.GetCurrentValue() < 5)
+	{
+		WantToStopSprint();
+	}
 }
 
 void ASBasePlayerController::MoveRight(float Value)

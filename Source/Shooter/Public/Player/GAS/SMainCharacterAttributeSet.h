@@ -16,4 +16,7 @@ class SHOOTER_API USMainCharacterAttributeSet : public UAttributeSet
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayAttributeData Health = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayAttributeData Stamina = 100.f;
 };
