@@ -15,7 +15,7 @@ class SHOOTER_API UMainCharacterMovementComponent : public UCharacterMovementCom
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
-	float FallDamageAbsorption = 15.f;
+	float FallDamageAbsorption = 13.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=FallDamage)
 	float FallDamageDevider = 100.f;
